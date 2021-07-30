@@ -53,6 +53,13 @@ int main(){
         }
     }
 
+    if (num == 0){
+        cout << "Sorry it's full :( "<< endl ;
+        return 0;
+
+    }
+
+
     cout << "registered as number " << num << endl;
 
     while(true){
