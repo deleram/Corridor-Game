@@ -55,5 +55,23 @@ int main(){
 
     cout << "registered as number " << num << endl;
 
+    while(true){
+        items[0].name = "turncheck";
+        items[0].content = "";
+        for(int i = 0; i < num; i++) items[0].content += "I";
+        bool turnflag = false;
+        while(!turnflag){
+            if(auto res = cli.Post("/turncheck", items)){
+                if((res -> body) == "yes"){
+                    turnflag = true;
+                }
+            }
+        }
+        items[0].name = "play";
+        cout << "Enter the desired number" << endl;
+        cin >> items[0].content_type;
+        auto res = cli.Post("/play", items);
+    }
+
     return 0;
 }
