@@ -1,7 +1,66 @@
 #include "httplib.h"
+#include <vector>
 
 using namespace httplib;
 using namespace std;
+
+
+class Game{
+    
+public:
+    Game(int number_of_players){
+        for (int i=0 ; i<21;++i){
+            for(int j=0;j<21 ; j++){
+                if (j%2==1 || i%2==1){
+                    Board[i][j]= ' ' ;
+                }else{
+                    Board[i][j]= 'o';
+                }
+            }
+        }
+        NP = number_of_players;
+        vector <int> A = {0, 20};
+        vector <int> B = {0, 20};
+        for(int i = 0; i < NP; i++){
+            player[i][0] = A[i / 2];
+            player[i][1] = B[i % 2];
+            Board[player[i][0]][player[i][1]] = (char)(49+ i);
+        }
+    }
+    string string_maker (){
+        string ans= "";
+        for(int i=0 ; i<21 ; ++i){
+            for (int j=0 ; j<21 ; j++){
+                ans.push_back(Board[i][j]);
+            }
+            ans+= '\n';
+        }
+        return ans;
+    }
+
+
+
+private:
+    char Board[21][21];
+    int player[4][2] , NP;
+
+
+
+
+
+
+
+};
+
+
+
+
+
+
+
+
+
+
 
 bool reg[5];
 int turn=1, people;
@@ -11,6 +70,7 @@ int main(){
 
     cout << "Number of players?" << endl ;
     cin >> people ;
+    Game quoridor(people);
 
     svr.Post("/register1", [&](const Request &req, Response &res){
         if(req.has_file("register1") && people>=1){
@@ -91,7 +151,7 @@ int main(){
         if(req.has_file("turncheck") && reg[people]){
             const auto& tmp = req.get_file_value("turncheck");
             if(turn == (int)tmp.content.size()){
-                res.set_content("yes", "text/plain");
+                res.set_content(quoridor.string_maker(), "text/plain");
             }
             else{
                 res.set_content("no", "text/plain");

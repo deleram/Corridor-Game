@@ -67,18 +67,23 @@ int main(){
         items[0].content = "";
         for(int i = 0; i < num; i++) items[0].content += "I";
         bool turnflag = false;
+        string Board;
         while(!turnflag){
             if(auto res = cli.Post("/turncheck", items)){
-                if((res -> body) == "yes"){
+                if((res -> body) != "no" && (res -> body) != "Sth went wrong"){
+                    Board=res -> body;
+
                     turnflag = true;
                 }
             }
         }
         items[0].name = "play";
-        cout << "Enter the desired number" << endl;
+        cout << Board;
+        cout << "Enter your desired move" << endl;
         cin >> items[0].content_type;
         auto res = cli.Post("/play", items);
     }
 
     return 0;
 }
+
