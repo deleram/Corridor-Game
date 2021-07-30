@@ -8,7 +8,9 @@ using namespace std;
 class Game{
     
 public:
+    
     Game(int number_of_players){
+        
         for (int i=0 ; i<21;++i){
             for(int j=0;j<21 ; j++){
                 if (j%2==1 || i%2==1){
@@ -27,6 +29,8 @@ public:
             Board[player[i][0]][player[i][1]] = (char)(49+ i);
         }
     }
+
+
     string string_maker (){
         string ans= "";
         for(int i=0 ; i<21 ; ++i){
@@ -38,11 +42,70 @@ public:
         return ans;
     }
 
+    bool Board_update(int gamer , string Move){
+
+        if (Move=="u" && (player[gamer-1][0]!=0)){
+            if(Board[player[gamer-1][0]-2][player[gamer-1][1]]=='o'){
+                Board[player[gamer-1][0]-2][player[gamer-1][1]]=(char) (48 + gamer);
+                Board[player[gamer-1][0]][player[gamer-1][1]]='o';
+                player[gamer-1][0]-=2;
+                return true;
+
+            }else{
+                return false;
+            }
+        }
+
+
+        else if (Move=="d" && (player[gamer-1][0]!=20)){
+            if(Board[player[gamer-1][0]+2][player[gamer-1][1]]=='o'){
+                Board[player[gamer-1][0]+2][player[gamer-1][1]]=(char) (48 + gamer);
+                Board[player[gamer-1][0]][player[gamer-1][1]]='o';
+                player[gamer-1][0]+=2;
+                return true;
+
+            }else{
+                return false;
+            }
+
+        }
+
+        else if (Move=="r" && (player[gamer-1][1]!=20)){
+            if(Board[player[gamer-1][0]][player[gamer-1][1]+2]=='o'){
+                Board[player[gamer-1][0]][player[gamer-1][1]+2]=(char) (48 + gamer);
+                Board[player[gamer-1][0]][player[gamer-1][1]]='o';
+                player[gamer-1][1]+=2;
+                return true;
+
+            }else{
+                return false;
+            }
+
+        }
+
+
+        else if (Move=="l" && (player[gamer-1][1]!=0)){
+            if(Board[player[gamer-1][0]][player[gamer-1][1]-2]=='o'){
+                Board[player[gamer-1][0]][player[gamer-1][1]-2]=(char) (48 + gamer);
+                Board[player[gamer-1][0]][player[gamer-1][1]]='o';
+                player[gamer-1][1]-=2;
+                return true;
+
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+
+    }
+
+
 
 
 private:
     char Board[21][21];
-    int player[4][2] , NP;
+    int player[4][2],NP;
 
 
 
@@ -57,12 +120,7 @@ private:
 
 
 
-
-
-
-
-
-bool reg[5];
+bool reg[5],answer;
 int turn=1, people;
 
 int main(){
@@ -165,11 +223,24 @@ int main(){
     svr.Post("/play", [&](const Request &req, Response &res){
        if(req.has_file("play")){
            const auto& tmp = req.get_file_value("play");
-           cout << tmp.content_type << endl;
+           answer=quoridor.Board_update(turn , tmp.content_type);
            turn = (turn % people) + 1 ;
-           res.set_content("number successfully arrived","text/plain");
+           
+           if(answer){
+           
+                res.set_content("number successfully arrived","text/plain");
+           
+           
+           }else{
+                
+                res.set_content("Move is not acceptable","text/plain");
+           
+           }
+       
        }else{
+       
            res.set_content("Sth went wrong","text/plain");
+       
        }
     });
 

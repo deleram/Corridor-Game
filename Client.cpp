@@ -79,9 +79,15 @@ int main(){
         }
         items[0].name = "play";
         cout << Board;
-        cout << "Enter your desired move" << endl;
+        cout << "Enter your desired move (u/d/r/l)" << endl;
         cin >> items[0].content_type;
-        auto res = cli.Post("/play", items);
+        if (auto res = cli.Post("/play", items)){
+            if (res->body=="Move is not acceptable")
+            {
+                cout << res->body<<endl;
+            }
+            
+        }
     }
 
     return 0;
