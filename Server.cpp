@@ -44,7 +44,7 @@ public:
 
     bool Board_update(int gamer , string Move){
 
-        if (Move=="u" && (player[gamer-1][0]!=0)){
+        if (Move=="u" && (player[gamer-1][0]!=0) && (Board[player[gamer-1][0]-1][player[gamer-1][1]]==' ')){
             if(Board[player[gamer-1][0]-2][player[gamer-1][1]]=='o'){
                 Board[player[gamer-1][0]-2][player[gamer-1][1]]=(char) (48 + gamer);
                 Board[player[gamer-1][0]][player[gamer-1][1]]='o';
@@ -57,7 +57,7 @@ public:
         }
 
 
-        else if (Move=="d" && (player[gamer-1][0]!=20)){
+        else if (Move=="d" && (player[gamer-1][0]!=20) && (Board[player[gamer-1][0]+1][player[gamer-1][1]]==' ')){
             if(Board[player[gamer-1][0]+2][player[gamer-1][1]]=='o'){
                 Board[player[gamer-1][0]+2][player[gamer-1][1]]=(char) (48 + gamer);
                 Board[player[gamer-1][0]][player[gamer-1][1]]='o';
@@ -70,7 +70,7 @@ public:
 
         }
 
-        else if (Move=="r" && (player[gamer-1][1]!=20)){
+        else if (Move=="r" && (player[gamer-1][1]!=20) && (Board[player[gamer-1][0]][player[gamer-1][1]+1]==' ')){
             if(Board[player[gamer-1][0]][player[gamer-1][1]+2]=='o'){
                 Board[player[gamer-1][0]][player[gamer-1][1]+2]=(char) (48 + gamer);
                 Board[player[gamer-1][0]][player[gamer-1][1]]='o';
@@ -84,7 +84,7 @@ public:
         }
 
 
-        else if (Move=="l" && (player[gamer-1][1]!=0)){
+        else if (Move=="l" && (player[gamer-1][1]!=0) && (Board[player[gamer-1][0]][player[gamer-1][1]-1]==' ')){
             if(Board[player[gamer-1][0]][player[gamer-1][1]-2]=='o'){
                 Board[player[gamer-1][0]][player[gamer-1][1]-2]=(char) (48 + gamer);
                 Board[player[gamer-1][0]][player[gamer-1][1]]='o';
@@ -97,6 +97,74 @@ public:
         }else{
             return false;
         }
+
+    }
+
+
+
+    bool wallmaker(string square){
+        int i=0,j=0;
+        char direction;
+        if (square[1]!=','){
+            i= stoi(square.substr(0,2));
+            if (square[4]!=','){
+                j=stoi(square.substr(3,2));
+            }else{
+                j=stoi(square.substr(3,1));
+            }
+        }else{
+            i=stoi(square.substr(0,1));
+            if (square[3]==','){
+                j=stoi(square.substr(2,1));
+            }else{
+                j=stoi(square.substr(2,2));
+            }
+
+        }
+        direction=square.back();
+
+        if ((i==1 && direction == 'u') || (j==11 && direction == 'r') || (i>11 || j >11 || i<1 || j<1) || ((direction != 'u') && (direction != 'r')) ){
+            return false;
+        }
+
+
+        if (direction == 'r'){
+            for (int a=0 ; a<5 ; ++a){
+                if(!( (a<2 && i<2) || (a>2) && i>10)){
+                    if (Board[2*(i-2)+a][(2*j)-1]!= ' '){
+                        return false;
+                    }
+                }
+            }
+            for (int b=0 ; b<5 ; ++b){
+                if (!( (b<2 && i<2) || (b>2) && i>10)){
+                    Board[2*(i-2)+b][(2*j)-1]='|';
+                }
+            }
+            return true;
+        }
+
+
+        if (direction == 'u'){
+            for (int a=0 ; a<5 ; ++a){
+                if(!( (a<2 && j<2) || (a>2) && j>10)){
+                    if (Board[2*i-3][2*(j-2)+a]!= ' '){
+                        cout << "hi";
+                        return false;
+                    }
+                }
+            }
+            for (int b=0 ; b<5 ; ++b){
+                if (!( (b<2 && j<2) || (b>2 && j>10))){
+                    Board[2*i-3][2*(j-2)+b]='-';
+                }
+            }
+            return true;
+        }
+
+
+
+
 
     }
 
@@ -223,7 +291,11 @@ int main(){
     svr.Post("/play", [&](const Request &req, Response &res){
        if(req.has_file("play")){
            const auto& tmp = req.get_file_value("play");
-           answer=quoridor.Board_update(turn , tmp.content_type);
+           if (tmp.content_type!="w"){
+                answer=quoridor.Board_update(turn , tmp.content_type);
+           }else{
+                answer=quoridor.wallmaker(tmp.filename);
+           }
            turn = (turn % people) + 1 ;
            
            if(answer){

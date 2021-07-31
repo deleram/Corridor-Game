@@ -79,8 +79,13 @@ int main(){
         }
         items[0].name = "play";
         cout << Board;
-        cout << "Enter your desired move (u/d/r/l)" << endl;
+        cout << "Enter your desired move (u/d/r/l) or 'w' for walls" << endl;
         cin >> items[0].content_type;
+        if (items[0].content_type == "w"){
+            cout << "Enter i,j as in matrix and up or right for example :3,3,u" << endl ;
+            cin >> items[0].filename ;
+
+        }
         if (auto res = cli.Post("/play", items)){
             if (res->body=="Move is not acceptable")
             {
