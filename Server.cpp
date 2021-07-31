@@ -128,7 +128,7 @@ public:
         }
 
 
-        if (direction == 'r'){
+        else if (direction == 'r'){
             for (int a=0 ; a<5 ; ++a){
                 if(!( (a<2 && i<2) || (a>2) && i>10)){
                     if (Board[2*(i-2)+a][(2*j)-1]!= ' '){
@@ -145,11 +145,10 @@ public:
         }
 
 
-        if (direction == 'u'){
+        else if (direction == 'u'){
             for (int a=0 ; a<5 ; ++a){
                 if(!( (a<2 && j<2) || (a>2) && j>10)){
                     if (Board[2*i-3][2*(j-2)+a]!= ' '){
-                        cout << "hi";
                         return false;
                     }
                 }
@@ -160,12 +159,25 @@ public:
                 }
             }
             return true;
+        }else {
+            return false;
         }
 
 
 
 
 
+    }
+
+
+
+
+    bool win(){
+        if (Board[10][10]!='o'){
+            return true;
+        }else{
+            return false;
+        }
     }
 
 
@@ -188,8 +200,8 @@ private:
 
 
 
-bool reg[5],answer;
-int turn=1, people;
+bool reg[5],answer,win=false;
+int turn=1, people,winner=0,numwin=0;
 
 int main(){
     Server svr;
@@ -278,6 +290,14 @@ int main(){
             const auto& tmp = req.get_file_value("turncheck");
             if(turn == (int)tmp.content.size()){
                 res.set_content(quoridor.string_maker(), "text/plain");
+
+                if (win && turn != winner){
+                    res.set_content("Sorry! You Lost!" , "text/plain");
+                    ++ numwin;
+                    if (numwin == people){
+                        svr.stop();
+                    }
+                }
             }
             else{
                 res.set_content("no", "text/plain");
@@ -289,31 +309,46 @@ int main(){
     });
 
     svr.Post("/play", [&](const Request &req, Response &res){
-       if(req.has_file("play")){
-           const auto& tmp = req.get_file_value("play");
-           if (tmp.content_type!="w"){
-                answer=quoridor.Board_update(turn , tmp.content_type);
-           }else{
-                answer=quoridor.wallmaker(tmp.filename);
-           }
-           turn = (turn % people) + 1 ;
-           
-           if(answer){
-           
-                res.set_content("number successfully arrived","text/plain");
-           
-           
-           }else{
-                
-                res.set_content("Move is not acceptable","text/plain");
-           
-           }
-       
-       }else{
-       
-           res.set_content("Sth went wrong","text/plain");
-       
+        if (!win){
+            if(req.has_file("play")){
+                const auto& tmp = req.get_file_value("play");
+        
+            if (tmp.content_type!="w"){
+                    answer=quoridor.Board_update(turn , tmp.content_type);
+                    if (quoridor.win()){
+                        winner=turn;
+                        win=true;
+                        ++ numwin;
+                    }
+            }else{
+                    answer=quoridor.wallmaker(tmp.filename);
+            }
+
+            
+            if(answer){
+            
+                    res.set_content("number successfully arrived","text/plain");
+                    if (winner == turn){
+                        res.set_content("You win", "text/plain");
+                    }
+            
+            
+            }else{
+                    
+                    res.set_content("Move is not acceptable","text/plain");
+            
+            }
+        
+        }else{
+        
+            res.set_content("Sth went wrong","text/plain");
+        
+        }
        }
+
+       
+
+        turn = (turn % people) + 1 ;
     });
 
 

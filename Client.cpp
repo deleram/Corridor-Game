@@ -70,15 +70,19 @@ int main(){
         string Board;
         while(!turnflag){
             if(auto res = cli.Post("/turncheck", items)){
-                if((res -> body) != "no" && (res -> body) != "Sth went wrong"){
+                if((res -> body) != "no" && (res -> body) != "Sth went wrong" && (res -> body) != "Sorry! You Lost!"){
                     Board=res -> body;
 
                     turnflag = true;
                 }
+                if (res -> body == "Sorry! You Lost!"){
+                    cout << endl << res -> body << endl ;
+                    return 0;
+                }
             }
         }
         items[0].name = "play";
-        cout << Board;
+        cout << Board << endl;
         cout << "Enter your desired move (u/d/r/l) or 'w' for walls" << endl;
         cin >> items[0].content_type;
         if (items[0].content_type == "w"){
@@ -89,9 +93,12 @@ int main(){
         if (auto res = cli.Post("/play", items)){
             if (res->body=="Move is not acceptable")
             {
-                cout << res->body<<endl;
+                cout << endl << " !!! " << res->body<< " !!! " << endl << endl;
+            }else if (res -> body == "You win" ){
+                cout << endl << "CONGRATS! " << res -> body << "!" << endl;
+                return 0;
             }
-            
+           
         }
     }
 
