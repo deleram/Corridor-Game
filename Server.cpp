@@ -28,7 +28,7 @@ int main(){
                 res.set_content("Taken", "text/plain");
             }
             else{
-                cout << "player 1 registered successfully" << endl;
+                cout << endl <<  "Player 1 registered successfully" << endl;
                 res.set_content("registered", "text.plain");
                 reg[1] = true;
             }
@@ -47,7 +47,7 @@ int main(){
                 res.set_content("Taken", "text/plain");
             }
             else{
-                cout << "player 2 registered successfully" << endl;
+                cout << endl << "Player 2 registered successfully" << endl;
                 res.set_content("registered", "text.plain");
                 reg[2] = true;
             }
@@ -66,7 +66,7 @@ int main(){
                 res.set_content("Taken", "text/plain");
             }
             else{
-                cout << "player 3 registered successfully" << endl;
+                cout << endl <<  "Player 3 registered successfully" << endl;
                 res.set_content("registered", "text.plain");
                 reg[3] = true;
             }
@@ -86,7 +86,7 @@ int main(){
                 res.set_content("Taken", "text/plain");
             }
             else{
-                cout << "player 4 registered successfully" << endl;
+                cout << endl << "Player 4 registered successfully" << endl;
                 res.set_content("registered", "text.plain");
                 reg[4] = true;
             }
@@ -106,7 +106,7 @@ int main(){
                 if (win && turn != winner){
                     res.set_content("Sorry! You Lost!" , "text/plain");
                     ++ numwin;
-                    ++turn;
+                    turn = (turn % people) + 1 ;
                     if (numwin == people){
                         svr.stop();
                     }

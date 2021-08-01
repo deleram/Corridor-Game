@@ -60,7 +60,7 @@ int main(){
     }
 
 
-    cout << "registered as number " << num << endl;
+    cout << "Registered as number " << num << endl<< endl;
 
     while(true){
         items[0].name = "turncheck";
